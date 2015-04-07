@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void Mergesort(int A[], int temp[], int left, int right);
+void Merge(int A[], int temp[], int left, int mid, int right);
+
+void main() {
+	FILE *file;
+	int i, j, k, nocase;
+	int arrlen;
+	int *ints = NULL;
+	int *temp = NULL;
+	
+	file = fopen("input.txt", "r");
+	if(file == NULL) 
+		exit(1);
+
+	fscanf(file, "%d", &nocase);
+	
+	for(i=0; i<nocase; i++) {
+		fscanf(file, "%d", &arrlen);
+
+		ints = (int*)malloc(sizeof(int)*arrlen);
+		temp = (int*)malloc(sizeof(int)*arrlen);
+
+		for(j=0; j<arrlen; j++) {
+			fscanf(file, "%d", &ints[j]);
+			temp[j] = 0;
+		}
+		
+		Mergesort(ints, temp, 0, arrlen-1);
+		
+		for(j=0; j<arrlen; j++)
+			printf("%d ", ints[j]);
+		printf("\n");
+		
+		free(ints);
+		free(temp);
+	}
+	fclose(file);
+}
+
+void Mergesort(int A[], int temp[], int left, int right) {
+	int mid;
+
+	if(right > left) {
+		mid = (right + left) / 2;
+		Mergesort(A, temp, left, mid);
+		Mergesort(A, temp, mid+1, right);
+		Merge(A, temp, left, mid+1, right);
+	}
+}
+
+void Merge(int A[], int temp[], int left, int mid, int right) {
+	int i, left_end, size, temp_pos;
+	
+	left_end = mid - 1;
+	temp_pos = left;
+	size = right - left + 1;
+
+	while((left <= left_end) && (mid <= right)) {
+		if(A[left] <= A[mid]) {
+			temp[temp_pos] = A[left];
+			temp_pos = temp_pos + 1;
+			left = left + 1;
+		} else {
+			temp[temp_pos] = A[mid];
+			temp_pos = temp_pos + 1;
+			mid = mid + 1;
+		}
+	}
+
+	while(left <= left_end) {
+		temp[temp_pos] = A[left];
+		left = left + 1;
+		temp_pos = temp_pos + 1;
+	}
+
+	while(mid <= right) {
+		temp[temp_pos] = A[mid];
+		mid = mid + 1;
+		temp_pos = temp_pos + 1;
+	}
+
+	for(i = 0; i <= size; i++) {
+		A[right] = temp[right];
+		right = right - 1;
+	}
+}
